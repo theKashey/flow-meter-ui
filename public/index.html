@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charSet="utf-8"/>
+    <head>
+        <title>Flow meter</title>
+    </head>
+<body>
+<style>
+    main {
+        margin: auto;
+        margin-top: 10vh;
+        justify-content: center;
+        display: grid;
+        grid-gap: 64px;
+    }
+
+    #results {
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 32px;
+    }
+
+    pre {
+        background-color: #EEE;
+        width: 300px;
+        height: 50vh;
+        overflow: auto;
+    }
+</style>
+<main>
+    <div>
+        <a href="https://github.com/theKashey/flow-meter">github</a>
+        <h1>Flow 💧 Meter</h1>
+    </div>
+    <form>
+        <input name="url" required placeholder="please enter url"/>
+        <button type="submit">meter</button>
+        <br>
+        <select name="compression">
+            <option>gzip</option>
+            <option>brotli</option>
+        </select>
+        <label>
+            h2
+            <input type="checkbox" checked name="h2"/>
+        </label>
+    </form>
+    <div id="results">
+        <pre id="flow">Stats</pre>
+        <pre id="messages">Flow</pre>
+    </div>
+</main>
+
+<script>
+  function onFormSubmit(event) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    fetch('/api/meter', {
+      method: 'post',
+      body: JSON.stringify({
+        url: data.get('url'),
+        compression: data.get('compression'),
+        h2: data.get('h2') ==='on'
+      }),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      }
+    }).then(async res => {
+      const {meter, messages} = await res.json()
+      document.querySelector('#flow').innerHTML = JSON.stringify(meter, undefined, 2)
+      document.querySelector('#messages').innerHTML = messages.join('\n');
+    })
+  }
+
+  document.querySelector('form').addEventListener('submit', onFormSubmit);
+
+</script>
+</body>
+</html>
